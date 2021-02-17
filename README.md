@@ -6,6 +6,8 @@ Do you want to ["Put Your Skin In The Game"](https://en.wikipedia.org/wiki/Skin_
 
 **Then the dwall (decentralized-wall) is just for you!**
 
+(Don't take it too serious, this is just for learning this stuff)
+
 ### Roadmap
 - Nice Frontend
 - Filter logic (by upvotes)
