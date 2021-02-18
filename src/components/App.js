@@ -2,8 +2,8 @@ import React, { Component } from 'react';
 import logo from '../logo.png';
 import Web3 from 'web3';
 import './App.css';
-
-
+import SocialNetwork from '../abis/SocialNetwork.json'
+import Navbar from './Navbar'
 
 class App extends Component {
 
@@ -28,37 +28,43 @@ class App extends Component {
   async loadBlockchainData() {
     const web3 = window.web3
     const accounts = await web3.eth.getAccounts()
-    console.log(accounts)
     this.setState({ account: accounts[0] })
+
+    const networkId = await web3.eth.net.getId()
+    const networkData = SocialNetwork.networks[networkId] 
+    if(networkData) {
+      console.log(networkId)
+      const socialNetwork = web3.eth.Contract(SocialNetwork.abi, networkData.address)
+      this.setState({ socialNetwork })
+      const postCount = await socialNetwork.methods.postCount().call()
+      this.setState({ postCount })
+
+      for (var i = 1; i <= postCount; i++) {
+        const post = await socialNetwork.methods.posts(i).call()
+        this.setState({
+          posts: [...this.state.posts, post]
+        })
+      }
+      console.log({ posts: this.state.posts})
+    } else {
+      window.alert('Error')
+    }
   }
 
   constructor(props) {
     super(props)
     this.state = {
-      account: ''
+      account: '',
+      socialNetwork: null,
+      postCount: 0,
+      posts: []
     }
   }
 
   render() {
     return (
       <div>
-        <nav className="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-          <a
-            className="navbar-brand col-sm-3 col-md-2 mr-0"
-            href="http://www.dappuniversity.com/bootcamp"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Dapp University
-          </a>
-          <ul className="navbar-nav px-3">
-            <li className="nav-item text-nowrap d-none d-sm-none d-sm-block">
-              <small className="text-secondary">
-                <small id="account">{this.state.account}</small>
-              </small>
-            </li>
-          </ul>
-        </nav>
+        <Navbar account={this.state.account}/>
         <div className="container-fluid mt-5">
           <div className="row">
             <main role="main" className="col-lg-12 d-flex text-center">
