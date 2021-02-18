@@ -1,8 +1,44 @@
 import React, { Component } from 'react';
 import logo from '../logo.png';
+import Web3 from 'web3';
 import './App.css';
 
+
+
 class App extends Component {
+
+  async componentWillMount() {
+    await this.loadWeb3()
+    await this.loadBlockchainData()
+  }
+
+  async loadWeb3() {
+    if (window.ethereum) {
+      window.web3 = new Web3(window.ethereum)
+      await window.ethereum.enable()
+    }
+    else if (window.web3) {
+      window.web3 = new Web3(window.web3.currentProvider)
+    }
+    else {
+      window.alert('Please install MetaMask!')
+    }
+  }
+
+  async loadBlockchainData() {
+    const web3 = window.web3
+    const accounts = await web3.eth.getAccounts()
+    console.log(accounts)
+    this.setState({ account: accounts[0] })
+  }
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      account: ''
+    }
+  }
+
   render() {
     return (
       <div>
@@ -15,6 +51,13 @@ class App extends Component {
           >
             Dapp University
           </a>
+          <ul className="navbar-nav px-3">
+            <li className="nav-item text-nowrap d-none d-sm-none d-sm-block">
+              <small className="text-secondary">
+                <small id="account">{this.state.account}</small>
+              </small>
+            </li>
+          </ul>
         </nav>
         <div className="container-fluid mt-5">
           <div className="row">
